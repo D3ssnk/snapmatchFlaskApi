@@ -22,22 +22,24 @@ def get_dropbox_client():
 
 
 # A function that takes in the file name and give us the url of that file in dropbox
+import dropbox
+from dropbox.sharing import SharedLinkSettings
+
 def get_direct_image_url(dropbox_client, file_path):
-    dropbox_client = dropbox_client
-
     try:
-        # Create a shared link
-        shared_link_metadata = dropbox_client.sharing_create_shared_link_with_settings(file_path)
+        # Create a shared link with specific settings to ensure it points directly to the file
+        shared_link_settings = SharedLinkSettings(requested_visibility=dropbox.sharing.RequestedVisibility.public)
+        shared_link_metadata = dropbox_client.sharing_create_shared_link_with_settings(file_path, settings=shared_link_settings)
 
-        # Access the URL property of the SharedLinkMetadata object
+        # Extract the shared link URL
         shared_link_url = shared_link_metadata.url
 
-        # Modify the shared link to include dl=1 parameter
-        direct_link = shared_link_url[:-1] + '1'
+        # Modify the shared link URL to include the direct download parameter
+        direct_link = shared_link_url.replace('www.dropbox.com', 'dl.dropboxusercontent.com')
 
         return direct_link
-    except dropbox.exceptions.HttpError as err:
-        # Handle HTTP errors (e.g., file not found)
+    except dropbox.exceptions.ApiError as err:
+        # Handle Dropbox API errors (e.g., file not found)
         print(f"Dropbox API error: {err}")
         return None
 
