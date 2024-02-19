@@ -1,0 +1,7 @@
+Flask==3.0.0
+Flask-Cors==4.0.0
+dropbox==11.36.2
+pymysql==1.1.0
+clarifai==10.0.1
+
+
