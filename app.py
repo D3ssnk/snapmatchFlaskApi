@@ -118,7 +118,7 @@ def get_challenges_from_database_by_user_id_route():
         response = make_response(jsonify(challenges))
 
         # Set Cache-Control header to prevent caching
-        response.headers['Cache-Control'] = 'no-cache, must-revalidate'
+        response.headers['Cache-Control'] = 'public, max-age=180'
 
         # Remove Content-Security-Policy header
         response.headers.pop('Content-Security-Policy', None)
