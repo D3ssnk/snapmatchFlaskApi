@@ -97,7 +97,6 @@ def upload_photo_to_database_route():
 @app.route('/api/getChallengesByUserID', methods=['GET'])
 def get_challenges_from_database_by_user_id_route():
     try:
-        # user_id = request.args.get('userID')
         user_id = 1  # fake user id exists in the database now
 
         # Ensure that 'userID' is present in the request query parameters
@@ -106,15 +105,21 @@ def get_challenges_from_database_by_user_id_route():
 
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
+
+        # Modify the filename part of the image URLs to include a cache-busting identifier
+        for challenge in challenges:
+            img_path_parts = os.path.splitext(challenge['ImgPath'])
+            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
+            challenge['ImgPath'] = cache_busting_url
+
         response = make_response(jsonify(challenges))
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'  # Prevent caching
+        response.headers['Cache-Control'] = 'public, max-age=3600'
         return response
 
     except Exception as e:
         # Return an error to the frontend if the upload was unsuccessful
         print('Error:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
-
 
 @app.route('/api/register', methods=['POST'])
 def register():
