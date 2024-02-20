@@ -99,7 +99,7 @@ def upload_photo_to_database_route():
 def get_challenges_from_database_by_user_id_route():
     try:
         # user_id = request.args.get('userID')
-        user_id = 3 # fake user id exists in the database now
+        user_id = 1 # fake user id exists in the database now
 
         # Ensure that 'userID' is present in the request query parameters
         if not user_id:
