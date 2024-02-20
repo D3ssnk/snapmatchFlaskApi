@@ -108,11 +108,15 @@ def get_challenges_from_database_by_user_id_route():
 
         # Modify the filename part of the image URLs to include a cache-busting identifier
         for challenge in challenges:
-            challenge['ImgPath'] += f'?v={int(time.time())}'
+            img_path_parts = os.path.splitext(challenge['ImgPath'])
+            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
+            challenge['ImgPath'] = cache_busting_url
+
 
         response = make_response(jsonify(challenges))
         response.headers['Cache-Control'] = 'public, max-age=120'
         del response.headers['Content-Security-Policy']
+        print(challenges)
         return response
 
     except Exception as e:
