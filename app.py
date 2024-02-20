@@ -107,6 +107,11 @@ def get_challenges_from_database_by_user_id_route():
         
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
+        for challenge in challenges:
+            img_path_parts = os.path.splitext(challenge['ImgPath'])
+            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
+            challenge['ImgPath'] = cache_busting_url
+            print(challenge)
         response = make_response(jsonify(challenges))
         response.headers['Cache-Control'] = 'no-cache, must-revalidate'
         del response.headers['Content-Security-Policy']
