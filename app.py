@@ -116,6 +116,7 @@ def get_challenges_from_database_by_user_id_route():
 
         # Create response
         response = make_response(jsonify(challenges))
+        print("It works on This device")
 
         # Set Cache-Control header to prevent caching
         response.headers['Cache-Control'] = 'public, max-age=180'
