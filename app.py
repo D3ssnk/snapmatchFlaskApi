@@ -111,7 +111,7 @@ def get_challenges_from_database_by_user_id_route():
         response.headers['Cache-Control'] = 'public, max-age=3600'
         del response.headers['Content-Security-Policy']
         print(challenges)
-        return jsonify(challenges)
+        return response
     except Exception as e:
         print('Error:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
