@@ -1,4 +1,6 @@
 import pymysql.cursors
+import time
+import os
 
 # MySQL database configuration
 DB_HOST = 'snapmatchdb.c3mmisa2asbw.eu-west-2.rds.amazonaws.com'
@@ -39,8 +41,30 @@ def insert_data_into_db(table_name, user_id, img_path, tags, caption):
 def get_challenges_by_user_id(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM Challenges WHERE UserID = %s', (user_id,))
+    cur.execute('SELECT ChallengeID, UserID, Tags, CreationDate, Caption FROM Challenges WHERE UserID = %s', (user_id,))
     challenges = [dict(challenge) for challenge in cur.fetchall()]
     conn.close()
     challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
     return challenges
+
+def get_challenge_URL_by_challenge_id(challenge_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT ImgPath FROM Challenges WHERE ChallengeID = %s', (challenge_id,))
+        imgPath = cur.fetchall()
+
+        if imgPath:  # Check if there's any result
+            img_path_parts = os.path.splitext(imgPath[0]['ImgPath'])
+            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
+            imgPath = cache_busting_url
+            return imgPath
+        else:
+            return None
+
+    except Exception as e:
+        print('Error:', str(e))
+        return None
+    finally:
+        conn.close()
+

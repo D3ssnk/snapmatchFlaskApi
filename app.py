@@ -5,7 +5,6 @@ from dropbox_utils import *
 from user_login_utils import *
 from image_recognition_ai import *
 from dropbox.files import WriteMode
-import hashlib
 import time
 import base64
 import os
@@ -55,42 +54,86 @@ def analyse_photo_with_ai_route():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# Function that provides the frontend with the challenge URL, caption, and object value to be displayed
+# Function that uploads the image with its caption and tag to the database and dropbox.
+@app.route('/api/uploadChallenge', methods=['POST'])
+def upload_photo_to_database_route():
+    try:
+        data = request.get_json()
+
+        # Ensure that 'photoData' and 'caption' are present in the request JSON
+        if 'photoData' not in data or 'caption' not in data or 'tag' not in data:
+            return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
+
+        photo_data = data['photoData']
+        caption = data['caption']
+        tag = data['tag']
+
+        # Decode base64-encoded photo data
+        photo_binary = base64.b64decode(photo_data)
+
+        # Generate a unique filename, for example, using a timestamp
+        timestamp = str(int(time.time()))
+        filename = f'captured_photo_{timestamp}.jpg'
+
+        # Upload the photo to Dropbox
+        dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
+        dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
+
+        # Receive the Dropbox image URL
+        challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
+
+        # Insert challenge into the database
+        user_id = 1  # dummy user until login is implemented
+        insert_data_into_db('Challenges', user_id, challenge_image_url, tag, caption)
+        return jsonify({'message': 'Photo received and uploaded to Dropbox successfully'})
+
+    except Exception as e:
+        # Return an error to the frontend if the upload was unsuccessful
+        print('Error processing request:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# Function that provides the frontend with the challenge URL, caption and object value to be displayed
 @app.route('/api/getChallengesByUserID', methods=['GET'])
 def get_challenges_from_database_by_user_id_route():
     try:
-        # user_id = request.args.get('userID')
-        user_id = 1 # fake user id exists in the database now
+        user_id = 1  # fake user id exists in the database now
 
         # Ensure that 'userID' is present in the request query parameters
         if not user_id:
             return jsonify({'error': 'No user ID provided'}), 400
-        
-       # Get challenges from the database
+
+        # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
-        
-        
-        # Modify image URLs to include cache-busting parameters
-        for challenge in challenges:
-            img_path_parts = os.path.splitext(challenge['ImgPath'])
-            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
-            challenge['ImgPath'] = cache_busting_url
 
-        # Create response
         response = make_response(jsonify(challenges))
-
-        # Set Cache-Control header to prevent caching
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 
-        # Remove Content-Security-Policy header
-        response.headers.pop('Content-Security-Policy', None)
-
-
         return response
+
     except Exception as e:
-        print('Error:', str(e))
+        # Return an error to the frontend if the upload was unsuccessful
         return jsonify({'error': 'Internal Server Error'}), 500
-    
+
+@app.route('/api/getChallengeURLFromID', methods=['POST'])
+def get_challenge_url_from_challenge_ID():
+    try:
+        data = request.get_json()
+
+        if 'challengeID' not in data:
+            print("problem 1")
+            return jsonify({'error': 'Invalid request format. Missing required field'}), 400
+
+        challenge_id = data['challengeID']
+        imgPath = get_challenge_URL_by_challenge_id(challenge_id)
+
+        # Return the imagePath as a JSON object
+        return jsonify({'imagePath': imgPath})
+
+    except Exception as e:
+        print("problem 3")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 
 @app.route('/api/register', methods=['POST'])
 def register():
