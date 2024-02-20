@@ -108,7 +108,6 @@ def get_challenges_from_database_by_user_id_route():
 
         response = make_response(jsonify(challenges))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        print("i made the call")
 
         return response
 
@@ -128,11 +127,9 @@ def get_challenge_url_from_challenge_ID():
         imgPath = get_challenge_URL_by_challenge_id(challenge_id)
 
         # Return the imagePath as a JSON object
-        print("i made the call")
         return jsonify({'imagePath': imgPath})
 
     except Exception as e:
-        print("problem 3")
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
