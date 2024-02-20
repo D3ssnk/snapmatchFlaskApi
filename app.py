@@ -128,6 +128,7 @@ def get_challenge_url_from_challenge_ID():
         imgPath = get_challenge_URL_by_challenge_id(challenge_id)
 
         # Return the imagePath as a JSON object
+        print("i made the call")
         return jsonify({'imagePath': imgPath})
 
     except Exception as e:
