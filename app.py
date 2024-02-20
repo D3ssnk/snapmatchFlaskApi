@@ -113,7 +113,6 @@ def get_challenges_from_database_by_user_id_route():
             file_hash = hashlib.md5(img_path.encode()).hexdigest()[:8]  # Generate a hash of the image URL
             cache_busting_url = f"{img_path}?v={file_hash}"  # Append hash as a query parameter
             challenge['ImgPath'] = cache_busting_url
-            print(cache_busting_url)
 
         return jsonify(challenges)
 
