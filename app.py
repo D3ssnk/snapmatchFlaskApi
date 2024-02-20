@@ -105,16 +105,23 @@ def get_challenges_from_database_by_user_id_route():
         if not user_id:
             return jsonify({'error': 'No user ID provided'}), 400
         
-        # Get challenges from the database
+       # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
+
+        # Modify image URLs to include cache-busting parameters
         for challenge in challenges:
             img_path_parts = os.path.splitext(challenge['ImgPath'])
             cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
             challenge['ImgPath'] = cache_busting_url
-            print(challenge)
+
+        # Create response
         response = make_response(jsonify(challenges))
+
+        # Set Cache-Control header to prevent caching
         response.headers['Cache-Control'] = 'no-cache, must-revalidate'
-        del response.headers['Content-Security-Policy']
+
+        # Remove Content-Security-Policy header
+        response.headers.pop('Content-Security-Policy', None)
         return response
     except Exception as e:
         print('Error:', str(e))
