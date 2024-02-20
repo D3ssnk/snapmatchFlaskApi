@@ -108,6 +108,7 @@ def get_challenges_from_database_by_user_id_route():
 
         response = make_response(jsonify(challenges))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        print("i made the call")
 
         return response
 
@@ -121,7 +122,6 @@ def get_challenge_url_from_challenge_ID():
         data = request.get_json()
 
         if 'challengeID' not in data:
-            print("problem 1")
             return jsonify({'error': 'Invalid request format. Missing required field'}), 400
 
         challenge_id = data['challengeID']
