@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request, make_response
+from datetime import datetime, timedelta
 from flask_cors import CORS
 from dropbox_utils import *
 from user_login_utils import *
@@ -105,7 +106,9 @@ def get_challenges_from_database_by_user_id_route():
 
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
-        return jsonify(challenges)
+        response = make_response(jsonify(challenges))
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+        return response
 
     except Exception as e:
         # Return an error to the frontend if the upload was unsuccessful
