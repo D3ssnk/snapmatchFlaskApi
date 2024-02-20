@@ -5,6 +5,7 @@ from dropbox_utils import *
 from user_login_utils import *
 from image_recognition_ai import *
 from dropbox.files import WriteMode
+import hashlib
 import time
 import base64
 import os
@@ -108,16 +109,13 @@ def get_challenges_from_database_by_user_id_route():
 
         # Modify the filename part of the image URLs to include a cache-busting identifier
         for challenge in challenges:
-            img_path_parts = os.path.splitext(challenge['ImgPath'])
-            cache_busting_url = f"{img_path_parts[0]}_v={int(time.time())}{img_path_parts[1]}"
+            img_path = challenge['ImgPath']
+            file_hash = hashlib.md5(img_path.encode()).hexdigest()[:8]  # Generate a hash of the image URL
+            cache_busting_url = f"{img_path}?v={file_hash}"  # Append hash as a query parameter
             challenge['ImgPath'] = cache_busting_url
             print(cache_busting_url)
 
-
-        response = make_response(jsonify(challenges))
-        response.headers['Cache-Control'] = 'public, max-age=120'
-        del response.headers['Content-Security-Policy']
-        return response
+        return jsonify(challenges)
 
     except Exception as e:
         # Return an error to the frontend if the upload was unsuccessful
