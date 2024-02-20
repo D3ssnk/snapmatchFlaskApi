@@ -109,6 +109,7 @@ def get_challenges_from_database_by_user_id_route():
         challenges = get_challenges_by_user_id(user_id)
         response = make_response(jsonify(challenges))
         response.headers['Cache-Control'] = 'public, max-age=3600'
+        del response.headers['Content-Security-Policy']
         print(challenges)
         return jsonify(challenges)
     except Exception as e:
