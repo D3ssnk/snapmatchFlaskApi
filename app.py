@@ -84,7 +84,7 @@ def upload_photo_to_database_route():
         challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
 
         # Insert challenge into the database
-        user_id = 1  # dummy user until login is implemented
+        user_id = get_user_id_from_session()  # dummy user until login is implemented
         insert_data_into_db('Challenges', user_id, challenge_image_url, tag, caption)
         return jsonify({'message': 'Photo received and uploaded to Dropbox successfully'})
 
