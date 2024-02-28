@@ -100,7 +100,6 @@ def get_challenges_from_database_by_user_id_route():
     try:
         # user_id = 3 # fake user id exists in the database now
         user_id = get_user_id_from_session()
-        print(user_id)
 
         # Ensure that 'userID' is present in the request query parameters
         if not user_id:
@@ -108,7 +107,6 @@ def get_challenges_from_database_by_user_id_route():
         
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
-        print(challenges)
         return jsonify(challenges)
     except Exception as e:
         print('Error:', str(e))

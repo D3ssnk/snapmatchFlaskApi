@@ -67,7 +67,6 @@ def user_login(username, password):
         query = f"SELECT UserID FROM Users WHERE UserName = '{username}' AND PasswordHash = '{password}'"
         cur.execute(query)
         user_id = cur.fetchone()
-        print(user_id)
         if user_id:
             print("User logged in successfully")
             return user_id['UserID']
