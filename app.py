@@ -150,6 +150,7 @@ def login():
 
         # Login the user
         user_id = user_login(username, password)
+        print(user_id)
         if user_id != -1:
             store_user_id_in_session(user_id)
             return jsonify({'message': 'User logged in successfully'})
@@ -157,7 +158,6 @@ def login():
             return jsonify({'message': 'User does not exist or password is incorrect'}), 400
     except Exception as e:
         print('Error:', str(e))
-        print('it was me')
         return jsonify({'message': 'Internal Server Error'}), 500
 
 @app.route('/api/getAllChallenges', methods=['GET'])
