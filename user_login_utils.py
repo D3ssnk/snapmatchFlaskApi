@@ -1,10 +1,10 @@
 from database_utils import *
+from flask import session
 import hashlib
 
 # Function to verify if the username and password are safe
 def safe_username_password(username, password):
     # Verify if the username and password are not empty
-    
     if not username or not password:
         return False
 
@@ -32,7 +32,7 @@ def user_register(username, password):
         cur = conn.cursor()
 
         #  Verify if the user already exists
-        query = f"SELECT * FROM Users WHERE Username = {username}"
+        query = f"SELECT * FROM Users WHERE Username = '{username}'"
         cur.execute(query)
         user = cur.fetchone()
 
@@ -42,7 +42,7 @@ def user_register(username, password):
         else:
             # Encrypt the password
             password = password_encryption(password)
-            query = f"INSERT INTO Users (Username, Password) VALUES ({username}, {password})"
+            query = f"INSERT INTO Users (UserName, PasswordHash) VALUES ('{username}', '{password}')"
             cur.execute(query)
             conn.commit()
             print("User registered successfully")
@@ -56,6 +56,7 @@ def user_register(username, password):
 # If login is successful, return the user ID, otherwise return -1
 def user_login(username, password):
     if not safe_username_password(username, password):
+        print("Malicious code detected")
         return -1
     try:
         conn = get_db_connection()
@@ -63,12 +64,12 @@ def user_login(username, password):
 
         # Encrypt the password
         password = password_encryption(password)
-        query = f"SELECT UserID FROM Users WHERE Username = {username} AND Password = {password}"
+        query = f"SELECT UserID FROM Users WHERE UserName = '{username}' AND PasswordHash = '{password}'"
         cur.execute(query)
         user_id = cur.fetchone()
         if user_id:
             print("User logged in successfully")
-            return user_id
+            return user_id[0]
         else:
             print("User does not exist or password is incorrect")
             return -1
@@ -76,3 +77,12 @@ def user_login(username, password):
         print(f"Error processing user info with database: {str(e)}")
     finally:
         conn.close()
+
+def store_user_id_in_session(user_id):
+    session['user_id'] = user_id
+
+def get_user_id_from_session():
+    return session.get('user_id', None)
+
+def logout_user():
+    session.pop('user_id', None)

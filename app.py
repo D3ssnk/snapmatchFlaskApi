@@ -10,6 +10,7 @@ import base64
 import os
 
 app = Flask(__name__)
+app.secret_key = 'secretforsnapmatchteam1766666'
 
 # Ensure that your Flask backend allows requests from your React app's domain.
 CORS(app)
@@ -154,8 +155,7 @@ def register():
     except Exception as e:
         print('Error:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
-
-
+    
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -164,18 +164,18 @@ def login():
         password = data.get('password')
 
         if not username or not password:
-            return jsonify({'error': 'Invalid request format. Missing required field'}), 400
+            return jsonify({'message': 'Invalid request format. Missing required field'}), 400
 
         # Login the user
         user_id = user_login(username, password)
         if user_id != -1:
-            return jsonify({'userID': user_id})
+            store_user_id_in_session(user_id)
+            return jsonify({'message': 'User logged in successfully'})
         else:
-            return jsonify({'error': 'User does not exist or password is incorrect'}), 400
+            return jsonify({'message': 'User does not exist or password is incorrect'}), 400
     except Exception as e:
         print('Error:', str(e))
-        return jsonify({'error': 'Internal Server Error'}), 500
-
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
