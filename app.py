@@ -98,7 +98,7 @@ def upload_photo_to_database_route():
 @app.route('/api/getChallengesByUserID', methods=['GET'])
 def get_challenges_from_database_by_user_id_route():
     try:
-        user_id = 1  # fake user id exists in the database now
+        user_id = get_user_id_from_session()
 
         # Ensure that 'userID' is present in the request query parameters
         if not user_id:
@@ -114,23 +114,6 @@ def get_challenges_from_database_by_user_id_route():
 
     except Exception as e:
         # Return an error to the frontend if the upload was unsuccessful
-        return jsonify({'error': 'Internal Server Error'}), 500
-
-@app.route('/api/getChallengeURLFromID', methods=['POST'])
-def get_challenge_url_from_challenge_ID():
-    try:
-        data = request.get_json()
-
-        if 'challengeID' not in data:
-            return jsonify({'error': 'Invalid request format. Missing required field'}), 400
-
-        challenge_id = data['challengeID']
-        imgPath = get_challenge_URL_by_challenge_id(challenge_id)
-
-        # Return the imagePath as a JSON object
-        return jsonify({'imagePath': imgPath})
-
-    except Exception as e:
         return jsonify({'error': 'Internal Server Error'}), 500
 
 

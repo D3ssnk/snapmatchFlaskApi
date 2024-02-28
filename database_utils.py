@@ -41,7 +41,7 @@ def insert_data_into_db(table_name, user_id, img_path, tags, caption):
 def get_challenges_by_user_id(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT ChallengeID, UserID, Tags, CreationDate, Caption FROM Challenges WHERE UserID = %s', (user_id,))
+    cur.execute('SELECT * FROM Challenges WHERE UserID = %s', (user_id,))
     challenges = [dict(challenge) for challenge in cur.fetchall()]
     conn.close()
     challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
