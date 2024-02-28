@@ -70,7 +70,7 @@ def user_login(username, password):
         print(user_id)
         if user_id:
             print("User logged in successfully")
-            return user_id[0]
+            return user_id['UserID']
         else:
             print("User does not exist or password is incorrect")
             return -1
