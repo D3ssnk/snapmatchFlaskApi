@@ -157,6 +157,7 @@ def login():
             return jsonify({'message': 'User does not exist or password is incorrect'}), 400
     except Exception as e:
         print('Error:', str(e))
+        print('it was me')
         return jsonify({'message': 'Internal Server Error'}), 500
 
 @app.route('/api/getAllChallenges', methods=['GET'])
