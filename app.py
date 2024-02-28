@@ -160,5 +160,15 @@ def login():
         print('Error:', str(e))
         return jsonify({'message': 'Internal Server Error'}), 500
 
+@app.route('/api/getAllChallenges', methods=['GET'])
+def get_all_challenges_route():
+    try:
+        # Get challenges from the database
+        challenges = get_all_challenges()
+        return jsonify(challenges)
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

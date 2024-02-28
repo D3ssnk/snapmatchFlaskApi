@@ -68,3 +68,14 @@ def get_challenge_URL_by_challenge_id(challenge_id):
     finally:
         conn.close()
 
+def get_all_challenges():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    query = f"SELECT * FROM Challenges"
+    cur.execute(query)
+    challenges = [dict(challenge) for challenge in cur.fetchall()]
+    conn.close()
+    challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
+    return challenges
+
+
