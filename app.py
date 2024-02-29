@@ -98,7 +98,6 @@ def upload_photo_to_database_route():
 @app.route('/api/getChallengesByUserID', methods=['GET'])
 def get_challenges_from_database_by_user_id_route():
     try:
-        # user_id = 3 # fake user id exists in the database now
         user_id = get_user_id_from_session()
 
         # Ensure that 'userID' is present in the request query parameters
@@ -107,6 +106,19 @@ def get_challenges_from_database_by_user_id_route():
         
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
+        return jsonify(challenges)
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Function that provides the frontend with other peoples challenge URL, caption and object value to be displayed
+@app.route('/api/getAllChallenges', methods=['GET'])
+def get_all_challenges_route():
+    try:
+        user_id = get_user_id_from_session()
+
+        # Get challenges from the database
+        challenges = get_all_challenges(user_id)
         return jsonify(challenges)
     except Exception as e:
         print('Error:', str(e))
@@ -158,15 +170,7 @@ def login():
         print('Error:', str(e))
         return jsonify({'message': 'Internal Server Error'}), 500
 
-@app.route('/api/getAllChallenges', methods=['GET'])
-def get_all_challenges_route():
-    try:
-        # Get challenges from the database
-        challenges = get_all_challenges()
-        return jsonify(challenges)
-    except Exception as e:
-        print('Error:', str(e))
-        return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
