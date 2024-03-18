@@ -1,8 +1,17 @@
 from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import resources_pb2, service_pb2, service_pb2_grpc
 from clarifai_grpc.grpc.api.status import status_code_pb2
+from flask import jsonify, request
+from dropbox_utils import *
+from dropbox.files import WriteMode
+import time
+import base64
+import os
 
-
+# initialises the dropbox client
+dropbox_client = get_dropbox_client()
+# Specify the Dropbox folder path
+DROPBOX_FOLDER_PATH = '/Snapmatch/'
 # Your PAT (Personal Access Token) can be found in the portal under Authentication
 PAT = 'b14bfd2ef50040b5b444262d3e3e063f'
 # Specify the correct user_id/app_id pairings
@@ -57,3 +66,27 @@ def get_image_items_from_ai(image_url):
             results.append(name)
 
     return set(results)
+
+
+def getImageIdentificationArray(data):
+    photo_data = data['photoData']
+    photo_binary = base64.b64decode(photo_data)
+
+    # Generate a unique filename, for example, using a timestamp
+    timestamp = str(int(time.time()))
+    filename = f'captured_photo_{timestamp}.jpg'
+
+    # Upload the temporary photo to Dropbox
+    dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
+    dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
+
+    # Receive the Dropbox image URL
+    challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
+
+    # Identify objects in the image
+    image_identity = list(get_image_items_from_ai(challenge_image_url))
+
+    # delete the temporary image
+    delete_image_from_dropbox(dropbox_client, dropbox_path)
+
+    return image_identity

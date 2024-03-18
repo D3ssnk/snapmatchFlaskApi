@@ -1,5 +1,6 @@
 import pymysql.cursors
 import time
+import datetime
 import os
 
 # MySQL database configuration
@@ -69,12 +70,26 @@ def get_challenge_URL_by_challenge_id(challenge_id):
         conn.close()
 
 def get_all_challenges(user_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM Challenges WHERE UserID != %s', (user_id,))
-    challenges = [dict(challenge) for challenge in cur.fetchall()]
-    conn.close()
-    challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
-    return challenges
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Get all challenges from other users with their usernames
+        query = f"""
+                SELECT Challenges.*, Users.UserName 
+                FROM Challenges JOIN Users 
+                ON Challenges.UserID = Users.UserID
+                WHERE Challenges.UserID != {user_id}
+                """
+        cur.execute(query)
+
+        challenges = [dict(challenge) for challenge in cur.fetchall()]
+        challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
+        return challenges
+    except Exception as e:
+        print('Error:', str(e))
+        return None
+    finally:
+        conn.close()
 
 

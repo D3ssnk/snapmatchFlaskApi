@@ -1,6 +1,7 @@
 from database_utils import *
 from flask import session
 import hashlib
+import base64
 
 # Function to verify if the username and password are safe
 def safe_username_password(username, password):
@@ -9,7 +10,7 @@ def safe_username_password(username, password):
         return False
 
     # Preventing SQL injection
-    malicious_code = ["<", ">", "{", "}", "[", "]", ";", ":", ",", ".", "?", "/", "\\", "|", "+", "=", "~", "`", " "]
+    malicious_code = ["<", ">", "{", "}", "[", "]", ";", ":", ",", ".", "?", "/", "\\", "|", "+", "-", "=", "~", "`", " ", "'", "#"]
     for code in malicious_code:
         if code in username or code in password:
             return False
@@ -21,6 +22,23 @@ def password_encryption(password):
     hl = hashlib.md5()
     hl.update(SALTED_INFO.encode(encoding='utf-8'))
     return hl.hexdigest()
+
+# function to emcrypt an integer
+def SymmetricEncryption(num):
+    num_str = "CongratulationsondiscoveringtheeastereggIleftbehind" + str(num)
+    num_bytes = num_str.encode('utf-8')
+    encoded_bytes = base64.b64encode(num_bytes)
+    encoded_str = encoded_bytes.decode('utf-8')
+    replaced_str = encoded_str.replace('W', '-')
+    return replaced_str
+
+# function to decrypt a integer
+def SymmetricDecryption(encoded_str):
+    restored_str = encoded_str.replace('-', 'W')
+    restored_bytes = restored_str.encode('utf-8')
+    decoded_bytes = base64.b64decode(restored_bytes)
+    decoded_str = decoded_bytes.decode('utf-8')
+    return decoded_str.split('Ileftbehind')[1]
 
 # Function to register a new user in the MySQL database
 # If registration is successful, return True, otherwise return False
@@ -86,3 +104,42 @@ def get_user_id_from_session():
 
 def logout_user():
     session.pop('user_id', None)
+
+# for google login, save user's data to the database
+def saveGoogleUserData(user_info):
+    conn = None
+    try: 
+        # extract username from the email (the section before '@')
+        user_email = user_info['email']
+        print("user email: ", user_email)
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(f"SELECT UserID FROM Users WHERE UserName = '{user_email}'")
+        existing_user_id = cur.fetchone()
+
+        # if the user has login before, return the userID
+        if existing_user_id:
+            # cur.execute('UPDATE Users SET UserName = %s, Email = %s, Avatar = %s WHERE UserID = %s',
+            #         (username, user_email, user_info['picture'], user_info['id']))
+            return existing_user_id['UserID']
+        # else, new user, insert user's information to the database
+        else:
+            current_datetime = datetime.datetime.now() 
+
+            query = f"INSERT INTO Users (UserName, Email, Avatar, RegistrationDate) VALUES ('{user_email}', '{user_email}', '{user_info['picture']}', '{current_datetime}')"
+            cur.execute(query)
+            conn.commit()
+            
+            cur.execute(f"SELECT UserID FROM Users WHERE UserName = '{user_email}'")
+            user_id = cur.fetchone()
+            print("After insertion user id: ", user_id['UserID'])
+            if user_id:
+                return user_id['UserID']
+            else:
+                return -1
+    except Exception as e:
+        print(f"Error inserting user into database: {str(e)}")
+    finally:
+        if conn is not None:
+            conn.close()
