@@ -74,11 +74,12 @@ def check_response_matches_ai_route():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# Function that uploads the image with its caption and tag to the database and dropbox.
+# Function that uploads the challenge image with its caption and tag to the database and dropbox.
 @app.route('/api/uploadChallenge', methods=['POST'])
-def upload_photo_to_database_route():
+def upload_photo_to_challenge_route():
     try:
         data = request.get_json()
+        user_id = get_user_id_from_session()
 
         # Ensure that 'photoData' and 'caption' are present in the request JSON
         if 'photoData' not in data or 'caption' not in data or 'tag' not in data:
@@ -93,7 +94,7 @@ def upload_photo_to_database_route():
 
         # Generate a unique filename, for example, using a timestamp
         timestamp = str(int(time.time()))
-        filename = f'captured_photo_{timestamp}.jpg'
+        filename = f'captured_photo_{timestamp}_{user_id}.jpg'
 
         # Upload the photo to Dropbox
         dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
@@ -103,8 +104,8 @@ def upload_photo_to_database_route():
         challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
 
         # Insert challenge into the database
-        user_id = get_user_id_from_session()  # dummy user until login is implemented
-        insert_data_into_db('Challenges', user_id, challenge_image_url, tag, caption)
+        insert_into_challenge_db(user_id, challenge_image_url, tag, caption)
+
         return jsonify({'message': 'Photo received and uploaded to Dropbox successfully'})
 
     except Exception as e:
@@ -112,6 +113,56 @@ def upload_photo_to_database_route():
         print('Error processing request:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
+# Function that uploads the response image with its caption and tag to the database and dropbox.
+@app.route('/api/uploadResponse', methods=['POST'])
+def upload_photo_to_response_route():
+    try:
+        data = request.get_json()
+        user_id = get_user_id_from_session()
+
+        # Ensure that 'photoData' and 'caption' are present in the request JSON
+        if 'photoData' not in data or 'caption' not in data or 'challengeTag' not in data or 'challengeID' not in data:
+            return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
+
+        photo_data = data['photoData']
+        caption = data['caption']
+        challengeTag = data['challengeTag']
+        challengeID = data['challengeID']
+
+        # Decode base64-encoded photo data
+        photo_binary = base64.b64decode(photo_data)
+
+        # Generate a unique filename, for example, using a timestamp
+        timestamp = str(int(time.time()))
+        filename = f'captured_photo_{timestamp}_{user_id}.jpg'
+
+        # Upload the photo to Dropbox
+        dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
+        dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
+
+        # Receive the Dropbox image URL
+        response_image_url = get_direct_image_url(dropbox_client, dropbox_path)
+
+        # Insert challenge into the database
+        insert_points_into_db(challengeID,user_id)
+        insert_into_response_db(challengeID, user_id, response_image_url, challengeTag, caption)
+        return jsonify({'message': 'Photo received and uploaded to Dropbox successfully'})
+
+    except Exception as e:
+        # Return an error to the frontend if the upload was unsuccessful
+        print('Error processing request:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Function that provides the frontend with the leaderboard
+@app.route('/api/getLeaderboard', methods=['POST'])
+def get_leaderboard_route():
+    try:
+        # Get leaderboard from the database
+        leaderboard = get_leaderboard_from_database()
+        return jsonify(leaderboard)
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 # Function that provides the frontend with the challenge URL, caption and object value to be displayed
 @app.route('/api/getChallengesByUserID', methods=['GET'])

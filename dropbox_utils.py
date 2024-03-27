@@ -1,5 +1,8 @@
 from database_utils import get_db_connection
 import dropbox
+from dropbox.sharing import SharedLinkSettings
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
 
 # Function to get the dropbox parameters from the database
 def get_app_parameter(pname):
@@ -22,20 +25,17 @@ def get_dropbox_client():
 
 
 # A function that takes in the file name and give us the url of that file in dropbox
-import dropbox
-from dropbox.sharing import SharedLinkSettings
 
 def get_direct_image_url(dropbox_client, file_path):
     try:
-        # Create a shared link with specific settings to ensure it points directly to the file
-        shared_link_settings = SharedLinkSettings(requested_visibility=dropbox.sharing.RequestedVisibility.public)
-        shared_link_metadata = dropbox_client.sharing_create_shared_link_with_settings(file_path, settings=shared_link_settings)
+        # Create a shared link with default settings
+        shared_link_metadata = dropbox_client.sharing_create_shared_link(file_path)
 
         # Extract the shared link URL
         shared_link_url = shared_link_metadata.url
 
-        # Modify the shared link URL to include the direct download parameter
-        direct_link = shared_link_url.replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+        # Construct the direct download URL with the necessary parameters (including WebP format)
+        direct_link = shared_link_url.replace('www.dropbox.com', 'dl.dropboxusercontent.com') + '?raw=1&format=webp'
 
         return direct_link
     except dropbox.exceptions.ApiError as err:
