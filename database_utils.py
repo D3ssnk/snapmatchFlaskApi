@@ -53,7 +53,7 @@ def insert_into_response_db(challengeID, user_id, img_path, tags, caption):
         cur = conn.cursor()
 
         # Use string formatting for the table name
-        query = f"INSERT INTO Responses (ChallengeID ,UserID, ImagePath, Tags, CommentText, PostDate) VALUES (%s,%s, %s, %s, NOW(),%s)"
+        query = f"INSERT INTO Responses (ChallengeID ,UserID, ImagePath, Tags, CommentText, PostDate) VALUES (%s,%s, %s, %s, %s,NOW())"
         cur.execute(query, (challengeID, user_id, img_path, tags, caption))
 
         conn.commit()
@@ -94,44 +94,52 @@ def insert_points_into_db(challengeID,userID):
 
 # Function to get a list of all challenges from a specific user in the MySQL database
 def get_challenges_by_user_id(user_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    query = f"""
-                    SELECT Challenges.*, Users.UserName 
-                    FROM Challenges JOIN Users 
-                    ON Challenges.UserID = Users.UserID
-                    WHERE Challenges.UserID = {user_id}
-                    """
-    cur.execute(query)
-    challenges = [dict(challenge) for challenge in cur.fetchall()]
-    conn.close()
-    challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
-    return challenges
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        query = f"""
+                        SELECT Challenges.*, Users.UserName 
+                        FROM Challenges JOIN Users 
+                        ON Challenges.UserID = Users.UserID
+                        WHERE Challenges.UserID = {user_id}
+                        """
+        cur.execute(query)
+        challenges = [dict(challenge) for challenge in cur.fetchall()]
+        challenges.sort(key=lambda challenge: challenge['CreationDate'], reverse=True)
+        return challenges
+    except Exception as e:
+        print(f"Error get challenges by user ID: {str(e)}")
+    finally:
+        conn.close()
 
-# Function to get a list of all challenges from a specific user in the MySQL database
-def get_responses_by_user_id(user_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    query = f"""
-                    SELECT Responses.*, Users.UserName 
-                    FROM Responses JOIN Users 
-                    ON Responses.UserID = Users.UserID
-                    WHERE Responses.UserID = {user_id}
-                    """
-    cur.execute(query)
-    responses = [dict(response) for response in cur.fetchall()]
-    conn.close()
-    responses.sort(key=lambda response: response['CreationDate'], reverse=True)
-    return responses
+# Function to get a list of all responses from a specific challenge in the MySQL database
+def get_responses_by_challenge_id(challenge_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        query = f"""
+        SELECT Responses.*, Users.UserName
+        FROM Responses
+        JOIN Users ON Responses.UserID = Users.UserID
+        WHERE Responses.ChallengeID = {challenge_id};
+        """
+        cur.execute(query)
+        responses = [dict(response) for response in cur.fetchall()]
+        responses.sort(key=lambda response: response['PostDate'], reverse=True)
+        return responses
+    except Exception as e:
+        print(f"Error get responses by challenge ID: {str(e)}")
+    finally:
+        conn.close()
 
 def get_leaderboard_from_database():
     conn = get_db_connection()
     cur = conn.cursor()
     query = """
-                SELECT UserName, UserScore
+                SELECT UserName, UserScore, UserID
                 FROM Users
-                ORDER BY UserScore DESC
-                LIMIT 5;
+                ORDER BY UserScore DESC;
                     """
     cur.execute(query)
     leaderboard = [dict(users) for users in cur.fetchall()]

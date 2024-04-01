@@ -157,12 +157,41 @@ def upload_photo_to_response_route():
 @app.route('/api/getLeaderboard', methods=['POST'])
 def get_leaderboard_route():
     try:
+        user_id = get_user_id_from_session()
         # Get leaderboard from the database
         leaderboard = get_leaderboard_from_database()
-        return jsonify(leaderboard)
+        for i, user in enumerate(leaderboard):
+            if user['UserID'] == user_id:
+                index = i + 1
+                userInfo = [user]
+                break
+        leaderboard = leaderboard[:5]
+        response_data ={
+            'data' : leaderboard,
+            'leaderboardPlace' : index,
+            'userInfo' : userInfo
+        }
+        return jsonify(response_data)
     except Exception as e:
         print('Error:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+# Function that provides the frontend with the challenge URL, caption and object value to be displayed
+@app.route('/api/getResponsesByChallengeID', methods=['POST'])
+def get_responses_route():
+    try:
+        data = request.get_json()
+        # Ensure that 'challengeID' present in the request JSON
+        if 'challengeID' not in data:
+            return jsonify({'error': 'Invalid request format. Missing required field challenge ID}'}), 400
+
+        challengeID = data['challengeID']
+        # Get responses from the database
+        responses = get_responses_by_challenge_id(challengeID)
+        return jsonify(responses)
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'error': 'Internal Server Error in get responses'}), 500
 
 # Function that provides the frontend with the challenge URL, caption and object value to be displayed
 @app.route('/api/getChallengesByUserID', methods=['GET'])
@@ -239,6 +268,16 @@ def login():
     except Exception as e:
         print('Error:', str(e))
         return jsonify({'message': 'Internal Server Error'}), 500
+    
+@app.route('/api/logout', methods=['GET'])
+def logout():
+    try:
+        # Clear the user session
+        session.clear()
+        return jsonify({'message': 'User logged out successfully'})
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 # for Google login
 @app.route('/api/google/login', methods = ['GET'])
@@ -311,7 +350,7 @@ def googleLoginJump():
 
 
 @app.route('/api/google/logout', methods = ['GET'])
-def logout():
+def googleLogout():
     # Get the access token from the session
     access_token = session.get('access_token')
     if access_token:
