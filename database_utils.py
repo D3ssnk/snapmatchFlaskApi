@@ -125,9 +125,13 @@ def get_responses_by_challenge_id(challenge_id):
         JOIN Users ON Responses.UserID = Users.UserID
         WHERE Responses.ChallengeID = {challenge_id};
         """
+        print("did 1")
         cur.execute(query)
+        print("did 2")
         responses = [dict(response) for response in cur.fetchall()]
+        print("did 3")
         responses.sort(key=lambda response: response['PostDate'], reverse=True)
+        print("did 4")
         return responses
     except Exception as e:
         print(f"Error get responses by challenge ID: {str(e)}")
