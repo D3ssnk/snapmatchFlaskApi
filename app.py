@@ -186,6 +186,7 @@ def get_responses_route():
             return jsonify({'error': 'Invalid request format. Missing required field challenge ID}'}), 400
 
         challengeID = data['challengeID']
+        print(challengeID)
         # Get responses from the database
         responses = get_responses_by_challenge_id(challengeID)
         return jsonify(responses)
