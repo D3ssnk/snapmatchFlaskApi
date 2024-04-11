@@ -62,6 +62,7 @@ def insert_into_response_db(challengeID, user_id, img_path, tags, caption):
     finally:
         conn.close()
 
+#hi
 # Function check how many responses have currently been made for a challenge and then gives the user points accordingly
 def insert_points_into_db(challengeID,userID):
     try:
