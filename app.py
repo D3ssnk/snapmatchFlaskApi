@@ -206,6 +206,7 @@ def get_challenges_from_database_by_user_id_route():
         # Get challenges from the database
         challenges = get_challenges_by_user_id(user_id)
         print("THE CHALLENGE WAS REQUESTED")
+        print(challenges)
         return jsonify(challenges)
     except Exception as e:
         print('Error:', str(e))
