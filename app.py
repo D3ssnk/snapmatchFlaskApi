@@ -161,7 +161,7 @@ def get_leaderboard_route():
         # Get leaderboard from the database
         leaderboard = get_leaderboard_from_database()
         for i, user in enumerate(leaderboard):
-            print(user, i,user_id)
+            print(user_id, user['UserID'])
             if user['UserID'] == user_id:
                 index = i + 1
                 userInfo = [user]
