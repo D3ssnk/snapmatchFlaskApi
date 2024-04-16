@@ -31,7 +31,7 @@ with open('client-secret.json', 'r') as f:
 
 GOOGLE_CLIENT_ID = client_secrets['web']['client_id']
 GOOGLE_CLIENT_SECRET= client_secrets['web']['client_secret'] 
-REDIRECT_URI = "http://localhost:5000/login/google/authorised"
+REDIRECT_URI = "https://snapmatchapi.org/login/google/authorised"
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 
 
@@ -259,7 +259,6 @@ def login():
 
         # Login the user
         user_id = user_login(username, password)
-        print(user_id)
         if user_id != -1 and user_id != None:
             store_user_id_in_session(user_id)
             return jsonify({'message': 'User logged in successfully'})
@@ -317,8 +316,8 @@ def auth():
                     # Encrypt the user id and send it to the frontend
                     user_id = SymmetricEncryption(user_id)
                     # choose the front end url between local and production
-                    front_end_url = "http://127.0.0.1:3000"
-                    # front_end_url = "https://snapmatch.top"
+                    # front_end_url = "http://127.0.0.1:3000"
+                    front_end_url = "https://snapmatch.top"
                     return redirect(f"{front_end_url}/google_return_menu?userid={user_id}")
                 else:
                     return jsonify({'message': 'Failed to get user id'}), 400
