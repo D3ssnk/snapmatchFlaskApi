@@ -36,7 +36,7 @@ def get_direct_image_url(dropbox_client, file_path):
 
         # Construct the direct download URL with the necessary parameters (including WebP format)
         direct_link = shared_link_url
-        direct_link = direct_link.replace('?dl=0', '')
+        direct_link = direct_link.replace('&dl=0', '')
         return direct_link
     except dropbox.exceptions.ApiError as err:
         # Handle Dropbox API errors (e.g., file not found)
