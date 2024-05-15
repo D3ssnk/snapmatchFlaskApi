@@ -57,6 +57,7 @@ def analyse_photo_with_ai_route():
         dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
 
         challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
+        print(challenge_image_url)
         image_identity = getImageIdentificationArray(challenge_image_url)
         delete_image_from_dropbox(dropbox_client, dropbox_path)
         print(image_identity)
