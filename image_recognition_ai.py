@@ -12,8 +12,13 @@ import os
 dropbox_client = get_dropbox_client()
 # Specify the Dropbox folder path
 DROPBOX_FOLDER_PATH = '/Snapmatch/'
-# Your PAT (Personal Access Token) can be found in the portal under Authentication
-PAT = 'b14bfd2ef50040b5b444262d3e3e063f'
+##################################################################################################
+# In this section, we set the user authentication, user and app ID, model details, and the URL
+# of the image we want as an input. Change these strings to run your own example.
+#################################################################################################
+
+# Your PAT (Personal Access Token) can be found in the Account's Security section
+PAT = '04e3bce0eb5f4488b325b4658c2e13d3'
 # Specify the correct user_id/app_id pairings
 # Since you're making inferences outside your app's scope
 USER_ID = 'clarifai'
@@ -21,9 +26,16 @@ APP_ID = 'main'
 # Change these to whatever model and image URL you want to use
 MODEL_ID = 'general-image-detection'
 MODEL_VERSION_ID = '1580bb1932594c93b7e2e04456af7c6f'
+IMAGE_URL = 'https://samples.clarifai.com/metro-north.jpg'
+# To use a local file, assign the location variable
+# IMAGE_FILE_LOCATION = 'YOUR_IMAGE_FILE_LOCATION_HERE'
 
+############################################################################
+# YOU DO NOT NEED TO CHANGE ANYTHING BELOW THIS LINE TO RUN THIS EXAMPLE
+############################################################################
 
 def get_image_items_from_ai(image_url):
+    
     channel = ClarifaiChannel.get_grpc_channel()
     stub = service_pb2_grpc.V2Stub(channel)
 
@@ -66,6 +78,11 @@ def get_image_items_from_ai(image_url):
             results.append(name)
 
     return set(results)
+
+
+
+
+    
 
 
 def getImageIdentificationArray(data):
