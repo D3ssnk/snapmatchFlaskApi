@@ -102,6 +102,7 @@ def getImageIdentificationArray(data):
     challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
 
     # Identify objects in the image
+    print(challenge_image_url)
     image_identity = list(get_image_items_from_ai(challenge_image_url))
 
     # delete the temporary image
