@@ -52,12 +52,11 @@ def get_image_items_from_ai(image_url):
             user_app_id=userDataObject,  # The userDataObject is created in the overview and is required when using a
             # PAT
             model_id=MODEL_ID,
-            version_id=MODEL_VERSION_ID,  # This is optional. Defaults to the latest model version
             inputs=[
                 resources_pb2.Input(
                     data=resources_pb2.Data(
                         image=resources_pb2.Image(
-                            url="https://dl.dropboxusercontent.com/scl/fi/aoydlgqg4v0lrpdxlzxzl/captured_photo_1715762611.jpg?rlkey=on8g58he79u5zt38nao15c158&dl=0"
+                            url=image_url
                             # base64=file_bytes
                         )
                     )
@@ -105,5 +104,6 @@ def getImageIdentificationArray(data):
     print(challenge_image_url)
     image_identity = list(get_image_items_from_ai(challenge_image_url))
 
-    
+    # delete the temporary image
+
     return image_identity
