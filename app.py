@@ -40,7 +40,6 @@ SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 def analyse_photo_with_ai_route():
     try:
         data = request.get_json()
-        user_id = get_user_id_from_session()
         # Ensure that 'photoData' are present in the request JSON
         if 'photoData' not in data:
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
@@ -51,7 +50,7 @@ def analyse_photo_with_ai_route():
 
         # Generate a unique filename, for example, using a timestamp
         timestamp = str(int(time.time()))
-        filename = f'captured_photo_{timestamp}_{user_id}.jpg'
+        filename = f'captured_photo_{timestamp}.jpg'
 
         # Upload the photo to Dropbox
         dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
@@ -72,7 +71,6 @@ def analyse_photo_with_ai_route():
 def check_response_matches_ai_route():
     try:
         data = request.get_json()
-        user_id = get_user_id_from_session()
         # Ensure that 'photoData' and 'challengeTag' are present in the request JSON
         if 'photoData' not in data or 'challengeTag' not in data:
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
@@ -84,7 +82,7 @@ def check_response_matches_ai_route():
 
         # Generate a unique filename, for example, using a timestamp
         timestamp = str(int(time.time()))
-        filename = f'captured_photo_{timestamp}_{user_id}.jpg'
+        filename = f'captured_photo_{timestamp}.jpg'
 
         # Upload the photo to Dropbox
         dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
