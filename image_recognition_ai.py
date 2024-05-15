@@ -57,7 +57,7 @@ def get_image_items_from_ai(image_url):
                 resources_pb2.Input(
                     data=resources_pb2.Data(
                         image=resources_pb2.Image(
-                            url="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg"
+                            url=image_url
                             # base64=file_bytes
                         )
                     )

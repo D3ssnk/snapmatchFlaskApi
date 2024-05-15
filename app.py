@@ -45,6 +45,7 @@ def analyse_photo_with_ai_route():
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
 
         # Receive the objects in the image from the AI
+        print(data)
         image_identity = getImageIdentificationArray(data)
         print(image_identity)
         return jsonify({'message': 'Photo received and identified successfully', 'data': image_identity})
