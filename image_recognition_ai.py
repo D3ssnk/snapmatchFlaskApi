@@ -48,7 +48,6 @@ def get_image_items_from_ai(image_url):
     # with open(IMAGE_FILE_LOCATION, "rb") as f:
     #     file_bytes = f.read()
 
-    image_url = "https://dl.dropboxusercontent.com/scl/fi/aoydlgqg4v0lrpdxlzxzl/captured_photo_1715762611.jpg?rlkey=on8g58he79u5zt38nao15c158&raw=1"
     image_response = requests.get(image_url)
 
     # Check if the request was successful
