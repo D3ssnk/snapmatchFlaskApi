@@ -67,6 +67,7 @@ def get_image_items_from_ai(image_url):
         metadata=metadata
     )
     if post_model_outputs_response.status.code != status_code_pb2.SUCCESS:
+        print("fialed here")
         return set()
 
     regions = post_model_outputs_response.outputs[0].data.regions
