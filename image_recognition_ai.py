@@ -52,6 +52,7 @@ def get_image_items_from_ai(image_url):
             user_app_id=userDataObject,  # The userDataObject is created in the overview and is required when using a
             # PAT
             model_id=MODEL_ID,
+            version_id=MODEL_VERSION_ID,  # This is optional. Defaults to the latest model version
             inputs=[
                 resources_pb2.Input(
                     data=resources_pb2.Data(
@@ -105,5 +106,6 @@ def getImageIdentificationArray(data):
     image_identity = list(get_image_items_from_ai(challenge_image_url))
 
     # delete the temporary image
+    delete_image_from_dropbox(dropbox_client, dropbox_path)
 
     return image_identity
