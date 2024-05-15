@@ -46,7 +46,6 @@ def analyse_photo_with_ai_route():
 
         # Receive the objects in the image from the AI
         image_identity = getImageIdentificationArray(data)
-        print(image_identity)
         return jsonify({'message': 'Photo received and identified successfully', 'data': image_identity})
 
     except Exception as e:
