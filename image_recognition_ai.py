@@ -7,6 +7,7 @@ from dropbox.files import WriteMode
 import time
 import base64
 import os
+import requests
 
 # initialises the dropbox client
 dropbox_client = get_dropbox_client()
@@ -47,25 +48,32 @@ def get_image_items_from_ai(image_url):
     # with open(IMAGE_FILE_LOCATION, "rb") as f:
     #     file_bytes = f.read()
 
-    post_model_outputs_response = stub.PostModelOutputs(
-        service_pb2.PostModelOutputsRequest(
-            user_app_id=userDataObject,  # The userDataObject is created in the overview and is required when using a
-            # PAT
-            model_id=MODEL_ID,
-            version_id=MODEL_VERSION_ID,  # This is optional. Defaults to the latest model version
-            inputs=[
-                resources_pb2.Input(
-                    data=resources_pb2.Data(
-                        image=resources_pb2.Image(
-                            url="https://dl.dropboxusercontent.com/scl/fi/aoydlgqg4v0lrpdxlzxzl/captured_photo_1715762611.jpg?rlkey=on8g58he79u5zt38nao15c158&raw=1"
-                            # base64=file_bytes
+    image_url = "https://dl.dropboxusercontent.com/scl/fi/aoydlgqg4v0lrpdxlzxzl/captured_photo_1715762611.jpg?rlkey=on8g58he79u5zt38nao15c158&raw=1"
+    image_response = requests.get(image_url)
+
+    # Check if the request was successful
+    if image_response.status_code == 200:
+        # Get the image data as bytes
+        image_bytes = image_response.content
+
+        # Pass the image data as bytes to Clarifai
+        post_model_outputs_response = stub.PostModelOutputs(
+            service_pb2.PostModelOutputsRequest(
+                user_app_id=userDataObject,
+                model_id=MODEL_ID,
+                version_id=MODEL_VERSION_ID,
+                inputs=[
+                    resources_pb2.Input(
+                        data=resources_pb2.Data(
+                            image=resources_pb2.Image(
+                                base64=image_bytes
+                            )
                         )
                     )
-                )
-            ]
-        ),
-        metadata=metadata
-    )
+                ]
+            ),
+            metadata=metadata
+        )
     if post_model_outputs_response.status.code != status_code_pb2.SUCCESS:
         return set()
 
