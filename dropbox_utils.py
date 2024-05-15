@@ -29,7 +29,7 @@ def get_dropbox_client():
 def get_direct_image_url(dropbox_client, file_path):
     try:
         # Create a shared link with default settings
-        shared_link_metadata = dropbox_client.sharing_create_shared_link_with_settings(file_path)
+        shared_link_metadata = dropbox_client.sharing_create_shared_link(file_path)
 
         # Extract the shared link URL
         shared_link_url = shared_link_metadata.url

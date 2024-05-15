@@ -57,7 +57,7 @@ def get_image_items_from_ai(image_url):
                 resources_pb2.Input(
                     data=resources_pb2.Data(
                         image=resources_pb2.Image(
-                            url=image_url
+                            url="https://dl.dropboxusercontent.com/scl/fi/j5t2wzyjcj5hqkfohwjxd/captured_photo_1715764049.jpg"
                             # base64=file_bytes
                         )
                     )
