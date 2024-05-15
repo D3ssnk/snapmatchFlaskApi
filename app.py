@@ -59,7 +59,6 @@ def analyse_photo_with_ai_route():
         challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
         print(challenge_image_url)
         image_identity = getImageIdentificationArray(challenge_image_url)
-        delete_image_from_dropbox(dropbox_client, dropbox_path)
         print(image_identity)
         return jsonify({'message': 'Photo received and identified successfully', 'data': image_identity})
 
