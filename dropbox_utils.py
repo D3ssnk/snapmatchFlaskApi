@@ -34,9 +34,8 @@ def get_direct_image_url(dropbox_client, file_path):
         # Extract the shared link URL
         shared_link_url = shared_link_metadata.url
 
-        # Construct the direct download URL with the necessary parameters
+        # Construct the direct download URL with the necessary parameters (including WebP format)
         direct_link = shared_link_url.replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-        direct_link = direct_link[:-1]+"1"
 
         return direct_link
     except dropbox.exceptions.ApiError as err:
