@@ -91,7 +91,6 @@ def check_response_matches_ai_route():
 
         challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
         image_identity = getImageIdentificationArray(challenge_image_url)
-        delete_image_from_dropbox(dropbox_client, dropbox_path)
         challengeTag = data['challengeTag']
 
         # Returns True if the response matches else false
