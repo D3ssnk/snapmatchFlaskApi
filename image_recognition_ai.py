@@ -107,3 +107,5 @@ def getImageIdentificationArray(data):
     delete_image_from_dropbox(dropbox_client, dropbox_path)
 
     return image_identity
+
+
