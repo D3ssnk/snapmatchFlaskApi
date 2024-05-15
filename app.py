@@ -40,6 +40,7 @@ SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 def analyse_photo_with_ai_route():
     try:
         data = request.get_json()
+        user_id = get_user_id_from_session()
         # Ensure that 'photoData' are present in the request JSON
         if 'photoData' not in data:
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
