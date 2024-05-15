@@ -57,7 +57,7 @@ def get_image_items_from_ai(image_url):
                 resources_pb2.Input(
                     data=resources_pb2.Data(
                         image=resources_pb2.Image(
-                            url="https://dl.dropboxusercontent.com/scl/fi/j5t2wzyjcj5hqkfohwjxd/captured_photo_1715764049.jpg"
+                            url=image_url
                             # base64=file_bytes
                         )
                     )
@@ -67,7 +67,6 @@ def get_image_items_from_ai(image_url):
         metadata=metadata
     )
     if post_model_outputs_response.status.code != status_code_pb2.SUCCESS:
-        print("fialed here")
         return set()
 
     regions = post_model_outputs_response.outputs[0].data.regions
@@ -102,9 +101,9 @@ def getImageIdentificationArray(data):
     challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
 
     # Identify objects in the image
-    print(challenge_image_url)
     image_identity = list(get_image_items_from_ai(challenge_image_url))
 
     # delete the temporary image
+    delete_image_from_dropbox(dropbox_client, dropbox_path)
 
     return image_identity
