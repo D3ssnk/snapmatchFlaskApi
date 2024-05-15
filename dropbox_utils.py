@@ -30,6 +30,7 @@ def get_direct_image_url(dropbox_client, file_path):
     try:
         # Create a shared link with default settings
         link = dropbox_client.files_get_temporary_link(file_path)
+        print(link)
 
         return link
     except dropbox.exceptions.ApiError as err:
