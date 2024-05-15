@@ -44,21 +44,8 @@ def analyse_photo_with_ai_route():
         if 'photoData' not in data:
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
 
-         # Decode base64-encoded photo data
-        photo_data = data['photoData']
-        photo_binary = base64.b64decode(photo_data)
-
-        # Generate a unique filename, for example, using a timestamp
-        timestamp = str(int(time.time()))
-        filename = f'captured_photo_{timestamp}.jpg'
-
-        # Upload the photo to Dropbox
-        dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
-        dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
-
-        challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
-        print(challenge_image_url)
-        image_identity = getImageIdentificationArray(challenge_image_url)
+        # Receive the objects in the image from the AI
+        image_identity = getImageIdentificationArray(data)
         print(image_identity)
         return jsonify({'message': 'Photo received and identified successfully', 'data': image_identity})
 
@@ -76,20 +63,7 @@ def check_response_matches_ai_route():
             return jsonify({'error': 'Invalid request format. Missing required field}'}), 400
 
         # Receive the objects in the image from the AI
-        # Decode base64-encoded photo data
-        photo_data = data['photoData']
-        photo_binary = base64.b64decode(photo_data)
-
-        # Generate a unique filename, for example, using a timestamp
-        timestamp = str(int(time.time()))
-        filename = f'captured_photo_{timestamp}.jpg'
-
-        # Upload the photo to Dropbox
-        dropbox_path = os.path.join(DROPBOX_FOLDER_PATH, filename)
-        dropbox_client.files_upload(photo_binary, dropbox_path, mode=WriteMode('add'))
-
-        challenge_image_url = get_direct_image_url(dropbox_client, dropbox_path)
-        image_identity = getImageIdentificationArray(challenge_image_url)
+        image_identity = getImageIdentificationArray(data)
         challengeTag = data['challengeTag']
 
         # Returns True if the response matches else false
