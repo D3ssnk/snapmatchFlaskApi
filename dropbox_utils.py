@@ -29,10 +29,16 @@ def get_dropbox_client():
 def get_direct_image_url(dropbox_client, file_path):
     try:
         # Create a shared link with default settings
-        link = dropbox_client.files_get_temporary_link(file_path)
-        print(link)
+        shared_link_metadata = dropbox_client.sharing_create_shared_link(file_path)
 
-        return link
+        # Extract the shared link URL
+        shared_link_url = shared_link_metadata.url
+
+        # Construct the direct download URL with the necessary parameters (including WebP format)
+        direct_link = shared_link_url.replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+        direct_link = direct_link.replace('&dl=0', '')
+
+        return direct_link
     except dropbox.exceptions.ApiError as err:
         # Handle Dropbox API errors (e.g., file not found)
         print(f"Dropbox API error: {err}")
